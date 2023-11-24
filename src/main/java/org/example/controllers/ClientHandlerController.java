@@ -59,7 +59,7 @@ public class ClientHandlerController extends Thread{
             clients.remove(socket);
             clientNameLists.remove(socket);
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            System.out.println(e.getMessage());
         }
     }
 

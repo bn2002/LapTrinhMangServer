@@ -40,7 +40,7 @@ public class Router {
             printWriter = new PrintWriter(socket.getOutputStream(), true);
             printWriter.println(response);
         } catch(Exception e) {
-
+            System.out.println(e.getMessage());
         }
 
     }
