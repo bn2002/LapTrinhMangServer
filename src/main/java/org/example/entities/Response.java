@@ -1,10 +1,8 @@
-package org.example.models;
+package org.example.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Optional;
 
 @Getter
 @Setter

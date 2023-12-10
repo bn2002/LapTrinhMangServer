@@ -1,4 +1,4 @@
-package org.example.models;
+package org.example.entities;
 
 
 import jakarta.persistence.*;
@@ -16,7 +16,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private String userId;
+    private int userId;
 
     @Column(name = "username")
     private String username;
