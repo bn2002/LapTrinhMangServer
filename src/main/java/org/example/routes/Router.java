@@ -44,7 +44,7 @@ public class Router implements UserControllerDelegate {
 
         if(controller.equals("room")) {
             RoomService roomService = new RoomService();
-            if(method.equals("create-room")) {
+            if(method.equals("createRoom")) {
                 String response = roomService.createRoom(request);
                 SocketUtil.sendResponse(socket, response);
             }

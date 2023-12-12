@@ -1,6 +1,5 @@
 package org.example.services;
 
-import com.google.gson.Gson;
 import org.example.entities.Request;
 import org.example.routes.Router;
 import org.example.utils.JsonUtil;
@@ -32,7 +31,6 @@ public class ClientHandlerService extends Thread{
                     throw new SocketException();
                 }
 
-                Gson gson = new Gson();
                 Request request = JsonUtil.getObject(outputString, Request.class);
                 if(request != null) {
                     this.router.handlerRequest(socket, request);

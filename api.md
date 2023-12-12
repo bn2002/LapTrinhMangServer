@@ -4,4 +4,4 @@
 
 rooms:
 
-{"controller": "room", "method": "create-room", "data": "{\"room_name\": \"Phòng thi 1\", \"room_description\": \"Phòng thi cho lớp khoa học máy tính\"}"}
+{"controller": "room", "method": "createRoom", "data": "{\"room_name\": \"Phòng thi 1\", \"room_description\": \"Phòng thi cho lớp khoa học máy tính\"}"}

@@ -1,6 +1,5 @@
 package org.example.services;
 
-import com.google.gson.Gson;
 import org.example.delegates.UserControllerDelegate;
 import org.example.entities.Request;
 import org.example.entities.Response;
@@ -42,15 +41,11 @@ public class UserService {
     }
 
     public String register(Request request) {
-        User user;
         UserRepository userRepository = DBUtil.getContext().getBean(UserRepository.class);
-        try {
-            Gson gson = new Gson();
-            user = gson.fromJson(request.getData(), User.class);
-        } catch(Exception e) {
-            return "data bạn nhập không hợp lệ";
+        User user = JsonUtil.getObject(request.getData(), User.class);
+        if(user == null) {
+            return JsonUtil.buidResponse(new Response("error", "Yêu cầu đăng ký không hợp lệ", ""));
         }
-
         if(user.getUsername().isBlank() || user.getPassword().isBlank() || user.getEmail().isBlank()) {
             return JsonUtil.buidResponse(new Response("error", "Vui lòng nhập đầy đủ thông tin", ""));
         }
