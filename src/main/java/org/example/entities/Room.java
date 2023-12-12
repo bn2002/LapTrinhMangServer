@@ -28,10 +28,10 @@ public class Room {
     private String roomDescription;
 
     @Column(name = "start_time")
-    private int startTime;
+    private Timestamp startTime;
 
     @Column(name = "end_time")
-    private int endTime;
+    private Timestamp endTime;
 
     @Column(name = "duration")
     private int duration;
@@ -40,7 +40,7 @@ public class Room {
     private int status;
 
     @Column(name = "is_pratice")
-    private int isPratice;
+    private int isPractice;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
