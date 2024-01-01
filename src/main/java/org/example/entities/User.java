@@ -27,6 +27,9 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "fullname")
+    private String fullName;
+
     @Column(name = "created_at")
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

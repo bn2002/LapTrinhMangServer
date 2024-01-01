@@ -1,5 +1,6 @@
 package org.example.routes;
 
+import org.example.services.ExamManagementService;
 import org.example.services.RoomService;
 import org.example.services.UserService;
 import org.example.delegates.UserControllerDelegate;
@@ -46,6 +47,14 @@ public class Router implements UserControllerDelegate {
             RoomService roomService = new RoomService();
             if(method.equals("createRoom")) {
                 String response = roomService.createRoom(request);
+                SocketUtil.sendResponse(socket, response);
+            }
+        }
+
+        if(controller.equals("examManagement")) {
+            ExamManagementService examManagementService = new ExamManagementService();
+            if(method.equals("create")) {
+                String response = examManagementService.create(request);
                 SocketUtil.sendResponse(socket, response);
             }
         }

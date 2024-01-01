@@ -1,16 +1,20 @@
 package org.example.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
-@Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Table(name = "rooms")
 public class Room {
     @Id
@@ -41,6 +45,15 @@ public class Room {
 
     @Column(name = "is_pratice")
     private int isPractice;
+
+    @Column(name = "number_question")
+    private int countQuestion;
+
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JoinTable(name = "question_rooms", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "question_id"))
+    private Collection<Question> questions;
 
     @Column(name = "updated_at")
     @UpdateTimestamp

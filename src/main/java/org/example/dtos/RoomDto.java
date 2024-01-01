@@ -4,9 +4,12 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.entities.Question;
 import org.hibernate.validator.constraints.Range;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -28,5 +31,11 @@ public class RoomDto {
     @Range(min = 0, message = "Thời gian thi không hợp lệ")
     private int duration;
 
+    private int countQuestion;
+
     private int isPractice;
+
+    private ArrayList<String> classId;
+
+    private Collection<Question> questions;
 }

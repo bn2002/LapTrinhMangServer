@@ -8,5 +8,5 @@ import lombok.Setter;
 public class Request {
     private String controller;
     private String method;
-    private String data;
+    private Object data;
 }

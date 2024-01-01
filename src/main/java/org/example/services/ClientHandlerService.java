@@ -27,6 +27,9 @@ public class ClientHandlerService extends Thread{
 
             while (true) {
                 String outputString = input.readLine();
+                if(outputString == null) {
+                    continue;
+                }
                 if (outputString.equals("logout")) {
                     throw new SocketException();
                 }

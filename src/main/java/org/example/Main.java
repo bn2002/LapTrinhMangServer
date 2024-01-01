@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         context = SpringApplication.run(Main.class, args);
         ArrayList<Socket> clients = new ArrayList<>();
-        try (ServerSocket serversocket = new ServerSocket(5001)) {
+        try (ServerSocket serversocket = new ServerSocket(5000)) {
             System.out.println("Server is started...");
             while (true) {
                 Socket socket = serversocket.accept();

@@ -25,7 +25,7 @@ import java.util.Set;
 public class RoomService {
     public String createRoom(Request request) {
         try {
-            RoomDto roomDto = MapperUtil.mapFromString(request.getData(), RoomDto.class);
+            RoomDto roomDto = (RoomDto)request.getData();
             ValidationUtil.runValidation(roomDto);
             if(roomDto.getRoomName().isBlank() || roomDto.getRoomDescription().isBlank() || roomDto.getStartTime() == null || roomDto.getEndTime() == null) {
                 return JsonUtil.buidResponse(new Response("error", "Yêu cầu tạo phòng của bạn không hợp lệ", ""));
