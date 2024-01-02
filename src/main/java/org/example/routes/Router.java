@@ -54,7 +54,7 @@ public class Router implements UserControllerDelegate {
         if(controller.equals("examManagement")) {
             ExamManagementService examManagementService = new ExamManagementService();
             if(method.equals("create")) {
-                String response = examManagementService.create(request);
+                String response = examManagementService.create(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
             }
         }
@@ -62,7 +62,7 @@ public class Router implements UserControllerDelegate {
     }
 
     public void sendError(Socket socket, String message) {
-        Response response = new Response("error", message, "");
+        Response response = new Response("error", "request_invalid" ,message, "");
         SocketUtil.sendResponse(socket, JsonUtil.buidResponse(response));
     }
     @Override

@@ -18,27 +18,27 @@ public class UserService {
             UserRepository userRepository = DBUtil.getContext().getBean(UserRepository.class);
 
             if(user == null) {
-                return JsonUtil.buidResponse(new Response("error", "Yêu cầu đăng nhập không hợp lệ", ""));
+                return JsonUtil.buidResponse(new Response("error", "user.login.error","Yêu cầu đăng nhập không hợp lệ", ""));
             }
 
             String username = user.getUsername();
             String password = user.getPassword();
 
             if(username.isBlank() || password.isBlank()) {
-                return JsonUtil.buidResponse(new Response("error", "Vui lòng nhập username và password", ""));
+                return JsonUtil.buidResponse(new Response("error", "user.login.error", "Vui lòng nhập username và password", ""));
             }
 
             User userInfo = userRepository.findUserByUsernameAndPassword(username, password);
             if(userInfo == null) {
-                return JsonUtil.buidResponse(new Response("error", "Thông tin đăng nhập không chính xác", ""));
+                return JsonUtil.buidResponse(new Response("error", "user.login.error", "Thông tin đăng nhập không chính xác", ""));
             }
             if(this.delegate != null) {
                 this.delegate.loginResponse(userInfo);
             }
-            return JsonUtil.buidResponse(new Response("success", "Đăng nhập thành công", ""));
+            return JsonUtil.buidResponse(new Response("success", "user.login.success", "Đăng nhập thành công", ""));
 
         } catch(Exception e) {
-            return JsonUtil.buidResponse(new Response("error", "Có lỗi không xác định đã xảy ra, hãy thử lại", ""));
+            return JsonUtil.buidResponse(new Response("error", "user.login.error", "Có lỗi không xác định đã xảy ra, hãy thử lại", ""));
         }
     }
 
@@ -47,24 +47,24 @@ public class UserService {
             UserRepository userRepository = DBUtil.getContext().getBean(UserRepository.class);
             User user = MapperUtil.mapFromObject(request.getData(), User.class);
             if(user == null) {
-                return JsonUtil.buidResponse(new Response("error", "Yêu cầu đăng ký không hợp lệ", ""));
+                return JsonUtil.buidResponse(new Response("error", "user.register.error", "Yêu cầu đăng ký không hợp lệ", ""));
             }
             if(user.getUsername().isBlank() || user.getPassword().isBlank() || user.getEmail().isBlank()) {
-                return JsonUtil.buidResponse(new Response("error", "Vui lòng nhập đầy đủ thông tin", ""));
+                return JsonUtil.buidResponse(new Response("error", "user.register.error", "Vui lòng nhập đầy đủ thông tin", ""));
             }
 
             if(userRepository.existsByUsername(user.getUsername())) {
-                return JsonUtil.buidResponse(new Response("error", "Tài khoản này đã tồn tại trong hệ thống", ""));
+                return JsonUtil.buidResponse(new Response("error", "user.register.error", "Tài khoản này đã tồn tại trong hệ thống", ""));
             }
 
             if(userRepository.existsByEmail(user.getEmail())) {
-                return JsonUtil.buidResponse(new Response("error", "Email này đã tồn tại trong hệ thống", ""));
+                return JsonUtil.buidResponse(new Response("error", "user.register.error", "Email này đã tồn tại trong hệ thống", ""));
             }
 
             userRepository.save(user);
-            return JsonUtil.buidResponse(new Response("success", "Đăng ký thành công", ""));
+            return JsonUtil.buidResponse(new Response("success", "user.register.success", "Đăng ký thành công", ""));
         } catch(Exception e) {
-            return JsonUtil.buidResponse(new Response("error", "Đăng ký thất bại, đã có lỗi xảy ra", ""));
+            return JsonUtil.buidResponse(new Response("error", "user.register.error", "Đăng ký thất bại, đã có lỗi xảy ra", ""));
         }
     }
 

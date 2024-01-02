@@ -19,8 +19,8 @@ public class RoomDto {
     @NotEmpty(message = "Tên phòng không được bỏ trống")
     private String roomName;
 
-    @NotEmpty(message = "Mô tả phòng thi không được bỏ trống")
-    private String roomDescription;
+    @NotEmpty(message = "Danh sách lớp")
+    private String listClassId;
 
     @NotNull(message = "Thời gian bắt đầu không được bỏ trống")
     private Timestamp startTime;
@@ -31,11 +31,10 @@ public class RoomDto {
     @Range(min = 0, message = "Thời gian thi không hợp lệ")
     private int duration;
 
+    @Range(min = 0, message = "Số lượng câu hỏi không hợp lệ")
     private int countQuestion;
 
     private int isPractice;
-
-    private ArrayList<String> classId;
 
     private Collection<Question> questions;
 }

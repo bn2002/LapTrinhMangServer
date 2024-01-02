@@ -28,8 +28,8 @@ public class Room {
     @Column(name = "room_name")
     private String roomName;
 
-    @Column(name = "room_description")
-    private String roomDescription;
+    @Column(name = "list_class_id")
+    private String listClassId;
 
     @Column(name = "start_time")
     private Timestamp startTime;
