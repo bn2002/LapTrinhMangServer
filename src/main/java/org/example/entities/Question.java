@@ -1,5 +1,6 @@
 package org.example.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,11 +28,12 @@ public class Question {
     @Column(name = "question_content")
     private String questionContent;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Collection<Answer> answers;
 
-    @ManyToMany(mappedBy = "questions")
-    private Collection<Room> rooms;
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Collection<QuestionRoom> rooms;
 
     @Column(name = "updated_at")
     @UpdateTimestamp

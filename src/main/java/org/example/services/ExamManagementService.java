@@ -6,6 +6,7 @@ import org.example.entities.Request;
 import org.example.entities.Response;
 import org.example.entities.Room;
 import org.example.entities.User;
+import org.example.entities.keys.QuestionRoomId;
 import org.example.repositories.RoomRepository;
 import org.example.repositories.UserRepository;
 import org.example.utils.DBUtil;
@@ -30,9 +31,14 @@ public class ExamManagementService {
             }
 
             Room room = MapperUtil.mapFromObject(roomDto, Room.class);
+            room.setOwnerId(user.getUserId());
             room.getQuestions().forEach(question -> {
-                question.setOwnerId(user.getUserId());
-                question.getAnswers().forEach(answer -> answer.setQuestion(question));
+                question.getQuestion().setOwnerId(user.getUserId());
+                question.setRoom(room);
+                question.getQuestion().getAnswers().forEach(tempQuestion -> {
+                    tempQuestion.setQuestion(question.getQuestion());
+                });
+                question.setQuestionRoomId(new QuestionRoomId(question.getQuestion().getQuestionId(), room.getRoomId()));
             });
             RoomRepository roomRepository = DBUtil.getContext().getBean(RoomRepository.class);
 
@@ -45,6 +51,13 @@ public class ExamManagementService {
             return JsonUtil.buidResponse(new Response("error", "exam.create.unknown_error", "Có lỗi không xác định đã xảy ra khi tạo phòng thi, hãy thử lại", ""));
         }
 
+    }
 
+    public String list(Request request, User user) {
+        RoomRepository roomRepository = DBUtil.getContext().getBean(RoomRepository.class);
+        ArrayList<Room> listRoom = roomRepository.findAllByOwnerId(user.getUserId());
+        Response response = new Response("success", "exam.list_room", "", listRoom);
+        logger.info("Lấy danh sách phòng thi thành công");
+        return JsonUtil.buidResponse(response);
     }
 }

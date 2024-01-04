@@ -1,6 +1,8 @@
 package org.example.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -50,10 +52,10 @@ public class Room {
     private int countQuestion;
 
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", fetch = FetchType.EAGER)
     @JsonBackReference
-    @JoinTable(name = "question_rooms", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "question_id"))
-    private Collection<Question> questions;
+//    @JoinTable(name = "question_rooms", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "question_id"))
+    private Collection<QuestionRoom> questions;
 
     @Column(name = "updated_at")
     @UpdateTimestamp

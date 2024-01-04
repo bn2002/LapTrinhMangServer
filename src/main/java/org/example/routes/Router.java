@@ -43,10 +43,13 @@ public class Router implements UserControllerDelegate {
             }
         }
 
-        if(controller.equals("room")) {
+        if(controller.equals("exam")) {
             RoomService roomService = new RoomService();
-            if(method.equals("createRoom")) {
-                String response = roomService.createRoom(request);
+            if(method.equals("attempt")) {
+                String response = roomService.attempt(request, this.currentUser);
+                SocketUtil.sendResponse(socket, response);
+            } else if(method.equals("list")) {
+                String response = roomService.list(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
             }
         }
@@ -55,6 +58,9 @@ public class Router implements UserControllerDelegate {
             ExamManagementService examManagementService = new ExamManagementService();
             if(method.equals("create")) {
                 String response = examManagementService.create(request, this.currentUser);
+                SocketUtil.sendResponse(socket, response);
+            }else if(method.equals("list")) {
+                String response = examManagementService.list(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
             }
         }
