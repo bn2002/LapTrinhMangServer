@@ -1,9 +1,11 @@
 package org.example.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.example.entities.keys.QuestionRoomId;
 
 import java.util.Objects;
@@ -14,16 +16,21 @@ import java.util.Objects;
 public class QuestionRoom {
 
     @EmbeddedId
+    @JsonIgnore
     private QuestionRoomId questionRoomId;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @MapsId("questionId")
     @AttributeOverride(name="questionId", column=@Column(name="question_id"))
+    @ToString.Exclude
+    @JsonManagedReference
     private Question question;
 
     @ManyToOne
     @MapsId("roomId")
     @AttributeOverride(name = "roomId", column = @Column(name = "room_id"))
+    @JsonBackReference
+    @ToString.Exclude
     private Room room;
 
     @Column(name = "question_point")

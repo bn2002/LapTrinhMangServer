@@ -5,15 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AttemptExamResponseDto {
+public class FinishAttemptDto {
     private int attemptId;
-    private String roomName;
-    private int duration;
-    private ArrayList<AttemptQuestionDto> questions;
 }

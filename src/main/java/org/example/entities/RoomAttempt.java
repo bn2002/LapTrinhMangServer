@@ -1,13 +1,13 @@
 package org.example.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Array;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -20,8 +20,9 @@ public class RoomAttempt {
     @Column(name = "attempt_id")
     private int attemptId;
 
-    @Column(name = "room_id")
-    private int roomId;
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
 
     @Column(name = "user_id")
     private int userId;
@@ -37,6 +38,10 @@ public class RoomAttempt {
 
     @Column(name = "attempt_status")
     private int attemptStatus; // status 1: đang thi, status 2: đã hoàn thành
+
+    @OneToMany(mappedBy = "roomAttempt", fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private List<AttemptQuestion> attemptQuestions;
 
     @Column(name = "created_at")
     @CreationTimestamp

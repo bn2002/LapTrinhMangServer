@@ -30,6 +30,9 @@ public class User {
     @Column(name = "fullname")
     private String fullName;
 
+    @Column(name = "class_code")
+    private String classCode;
+
     @Column(name = "created_at")
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

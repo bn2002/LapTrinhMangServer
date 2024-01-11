@@ -1,5 +1,6 @@
 package org.example.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,10 +20,15 @@ import java.sql.Timestamp;
 public class AttemptQuestion {
 
     @EmbeddedId
+    @JsonIgnore
     private AttemptQuestionId attemptQuestionId;
 
+    @ManyToOne
+    @JoinColumn(name = "attempt_id", insertable = false, updatable = false)
+    private RoomAttempt roomAttempt;
+
     @Column(name = "answer_id")
-    private int answerId;
+    private int selectedAnswerId;
 
     @Column(name = "created_at")
     @CreationTimestamp

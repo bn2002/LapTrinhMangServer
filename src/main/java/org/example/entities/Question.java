@@ -29,11 +29,16 @@ public class Question {
     private String questionContent;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Collection<Answer> answers;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @JsonBackReference
+    @ToString.Exclude
     private Collection<QuestionRoom> rooms;
+
+    @Transient
+    private int score;
 
     @Column(name = "updated_at")
     @UpdateTimestamp

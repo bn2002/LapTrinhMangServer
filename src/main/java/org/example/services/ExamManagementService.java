@@ -32,13 +32,14 @@ public class ExamManagementService {
 
             Room room = MapperUtil.mapFromObject(roomDto, Room.class);
             room.setOwnerId(user.getUserId());
-            room.getQuestions().forEach(question -> {
-                question.getQuestion().setOwnerId(user.getUserId());
-                question.setRoom(room);
-                question.getQuestion().getAnswers().forEach(tempQuestion -> {
-                    tempQuestion.setQuestion(question.getQuestion());
+            room.getQuestions().forEach(questionRoom -> {
+                questionRoom.getQuestion().setOwnerId(user.getUserId());
+                questionRoom.setRoom(room);
+                questionRoom.getQuestion().getAnswers().forEach(tempQuestion -> {
+                    tempQuestion.setQuestion(questionRoom.getQuestion());
                 });
-                question.setQuestionRoomId(new QuestionRoomId(question.getQuestion().getQuestionId(), room.getRoomId()));
+                questionRoom.setQuestionRoomId(new QuestionRoomId(questionRoom.getQuestion().getQuestionId(), room.getRoomId()));
+                questionRoom.setQuestionPoint(questionRoom.getQuestion().getScore());
             });
             RoomRepository roomRepository = DBUtil.getContext().getBean(RoomRepository.class);
 

@@ -51,6 +51,16 @@ public class Router implements UserControllerDelegate {
             } else if(method.equals("list")) {
                 String response = roomService.list(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
+            } else if(method.equals("saveAttemptRequest")) {
+                String response = roomService.saveAttemptRequest(request, this.currentUser);
+                if(!response.isBlank()) {
+                    SocketUtil.sendResponse(socket, response);
+                }
+            } else if(method.equals("finishAttemptRequest")) {
+                String response = roomService.finishAttemptRequest(request, this.currentUser);
+                if(!response.isBlank()) {
+                    SocketUtil.sendResponse(socket, response);
+                }
             }
         }
 

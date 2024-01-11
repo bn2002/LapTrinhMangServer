@@ -2,6 +2,7 @@ package org.example.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -53,7 +54,9 @@ public class Room {
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", fetch = FetchType.EAGER)
-    @JsonBackReference
+    @JsonManagedReference
+    @ToString.Exclude
+    @JsonIgnore
 //    @JoinTable(name = "question_rooms", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "question_id"))
     private Collection<QuestionRoom> questions;
 
