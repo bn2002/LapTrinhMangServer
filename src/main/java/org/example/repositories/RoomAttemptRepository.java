@@ -17,4 +17,6 @@ public interface RoomAttemptRepository extends JpaRepository<RoomAttempt, Intege
     public Optional<RoomAttempt> findByRoom_RoomIdAndUserId(int roomId, int userId);
 
     public  RoomAttempt findByAttemptId(int attemptId);
+
+    public ArrayList<RoomAttempt> findAllByUserIdAndAttemptStatusOrderByAttemptIdDesc(int userId, int attemptStatus);
 }

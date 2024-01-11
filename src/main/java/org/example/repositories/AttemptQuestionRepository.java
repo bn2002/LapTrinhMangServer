@@ -16,4 +16,6 @@ public interface AttemptQuestionRepository extends JpaRepository<AttemptQuestion
     public ArrayList<Integer> getListQuestionId(int attemptId);
 
     public AttemptQuestion getAttemptQuestionByAttemptQuestionId_AttemptIdAndAttemptQuestionId_QuestionId(int attemptId, int questionId);
+
+    public ArrayList<AttemptQuestion> getAllByAttemptQuestionId_AttemptId(int attemptId);
 }
