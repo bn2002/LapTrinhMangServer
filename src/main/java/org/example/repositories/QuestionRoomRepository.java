@@ -18,4 +18,8 @@ public interface QuestionRoomRepository extends JpaRepository<QuestionRoom, Ques
     @Transactional
     @Query(value = "DELETE FROM room_questions WHERE question_question_id IN :ids", nativeQuery = true)
     public void deleteByQuestionId(@Param("ids") ArrayList<Integer> ids);
+
+    @Modifying
+    @Transactional
+    public void deleteByQuestionRoomId_RoomId(int id);
 }

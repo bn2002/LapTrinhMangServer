@@ -3,10 +3,7 @@ package org.example.services;
 import org.example.dtos.*;
 import org.example.entities.*;
 import org.example.entities.keys.QuestionRoomId;
-import org.example.repositories.AttemptQuestionRepository;
-import org.example.repositories.QuestionRoomRepository;
-import org.example.repositories.RoomRepository;
-import org.example.repositories.UserRepository;
+import org.example.repositories.*;
 import org.example.utils.DBUtil;
 import org.example.utils.JsonUtil;
 import org.example.utils.MapperUtil;
@@ -165,10 +162,52 @@ public class ExamManagementService {
             // Lưu thông tin phòng
             roomRepository.save(room);
 
+            Response response = new Response("success", "exam.management.updateExam", "Cập nhật phòng thi thành công", null);
+            return JsonUtil.buidResponse(response);
+        } catch(Exception e) {
+            Response response = new Response("error", "exam.management.updateExam", "Có lỗi trong quá trình cập nhật phòng thi", null);
+            return JsonUtil.buidResponse(response);
+        }
+    }
+
+    public String deleteExam(Request request, User user) {
+        try {
+            EditRoomDto editRoomDto = MapperUtil.mapFromObject(request.getData(), EditRoomDto.class);
+            RoomRepository roomRepository = DBUtil.getContext().getBean(RoomRepository.class);
+            QuestionRoomRepository questionRoomRepository = DBUtil.getContext().getBean(QuestionRoomRepository.class);
+            AttemptQuestionRepository attemptQuestionRepository = DBUtil.getContext().getBean(AttemptQuestionRepository.class);
+            RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
+
+            Optional<Room> roomOptional = roomRepository.findById(editRoomDto.getRoomId());
+            if(!roomOptional.isPresent()) {
+                return JsonUtil.buidResponse(new Response("error", "exam.management.deleteExam", "Phòng thi này không tồn tại", ""));
+            }
+
+            int roomId = editRoomDto.getRoomId();
+            ArrayList<Integer> listAttemptId = roomAttemptRepository.getAttemptByRoomId(roomId);
+            if(listAttemptId.size() > 0) {
+                roomAttemptRepository.deleteByRoomId(roomId);
+                attemptQuestionRepository.deleteByAttemptId(listAttemptId);
+            }
+
+            questionRoomRepository.deleteByQuestionRoomId_RoomId(roomId);
+            roomRepository.deleteById(roomId);
+            Response response = new Response("success", "exam.management.deleteExam", "Xóa phòng thi thành công", null);
+            return JsonUtil.buidResponse(response);
+        } catch(Exception e) {
+            Response response = new Response("error", "exam.management.deleteExam", "Xóa phòng thi thất bại", null);
+            return JsonUtil.buidResponse(response);
+        }
+    }
+
+    public String viewExamScore(Request request, User user) {
+        try {
+            EditRoomDto editRoomDto = MapperUtil.mapFromObject(request.getData(), EditRoomDto.class);
+            RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
+            ArrayList<RoomAttempt> roomAttempts = roomAttemptRepository.getByRoom_RoomId(editRoomDto.getRoomId());
             return "";
         } catch(Exception e) {
             return "";
         }
-
     }
 }

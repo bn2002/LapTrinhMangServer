@@ -84,6 +84,12 @@ public class Router implements UserControllerDelegate {
             }else if(method.equals("updateExam")) {
                 String response = examManagementService.updateRoom(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
+            }else if(method.equals("deleteExam")) {
+                String response = examManagementService.deleteExam(request, this.currentUser);
+                SocketUtil.sendResponse(socket, response);
+            }else if(method.equals("viewScoreExam")) {
+                String response = examManagementService.viewExamScore(request, this.currentUser);
+                SocketUtil.sendResponse(socket, response);
             }
         }
 

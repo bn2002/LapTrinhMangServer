@@ -26,4 +26,9 @@ public interface AttemptQuestionRepository extends JpaRepository<AttemptQuestion
     @Transactional
     @Query(value = "DELETE FROM attempt_questions WHERE question_id  IN :ids", nativeQuery = true)
     public void deleteByQuestionId(@Param("ids") ArrayList<Integer> ids);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM attempt_questions WHERE attempt_id  IN :ids", nativeQuery = true)
+    public void deleteByAttemptId(@Param("ids") ArrayList<Integer> ids);
 }
