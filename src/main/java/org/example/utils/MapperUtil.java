@@ -6,6 +6,8 @@ import org.example.dtos.RoomDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.jackson.JsonNodeValueReader;
 
+import java.lang.reflect.Type;
+
 public class MapperUtil {
     public static <T> T mapFromString(String data, Class<T> type) {
         try {
@@ -20,6 +22,12 @@ public class MapperUtil {
     }
 
     public static<T> T mapFromObject(Object object, Class<T> type) {
+        ModelMapper modelMapper = new ModelMapper();
+        T result = modelMapper.map(object, type);
+        return result;
+    }
+
+    public static<T> T mapFromObject(Object object, Type type) {
         ModelMapper modelMapper = new ModelMapper();
         T result = modelMapper.map(object, type);
         return result;

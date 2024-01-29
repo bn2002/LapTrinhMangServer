@@ -258,16 +258,21 @@ public class RoomService {
             ArrayList<AttemptQuestionHistoryDto> attemptQuestionDtos = new ArrayList<>();
 
             roomAttempt.getRoom().getQuestions().forEach(questionRoom -> {
-                int userSelectedAnswer = userAnswer.get(questionRoom.getQuestion().getQuestionId());
-                int correctAnswerId = correctAnswer.get(questionRoom.getQuestion().getQuestionId());
-                ArrayList<AttemptAnswerDto> attemptAnswerDtos = (ArrayList<AttemptAnswerDto>) questionRoom.getQuestion().getAnswers().stream().map(answer -> new AttemptAnswerDto(answer.getAnswerId(), answer.getAnswerContent())).collect(Collectors.toList());
-                AttemptQuestionHistoryDto attemptQuestionDto = AttemptQuestionHistoryDto.builder()
-                        .selectedAnswer(userSelectedAnswer)
-                        .questionContent(questionRoom.getQuestion().getQuestionContent())
-                        .questionId(questionRoom.getQuestionRoomId().getQuestionId())
-                        .correctAnswer(correctAnswerId)
-                        .answers(attemptAnswerDtos).build();
-                attemptQuestionDtos.add(attemptQuestionDto);
+                try {
+                    int userSelectedAnswer = userAnswer.get(questionRoom.getQuestion().getQuestionId());
+                    int correctAnswerId = correctAnswer.get(questionRoom.getQuestion().getQuestionId());
+                    ArrayList<AttemptAnswerDto> attemptAnswerDtos = (ArrayList<AttemptAnswerDto>) questionRoom.getQuestion().getAnswers().stream().map(answer -> new AttemptAnswerDto(answer.getAnswerId(), answer.getAnswerContent())).collect(Collectors.toList());
+                    AttemptQuestionHistoryDto attemptQuestionDto = AttemptQuestionHistoryDto.builder()
+                            .selectedAnswer(userSelectedAnswer)
+                            .questionContent(questionRoom.getQuestion().getQuestionContent())
+                            .questionId(questionRoom.getQuestionRoomId().getQuestionId())
+                            .correctAnswer(correctAnswerId)
+                            .answers(attemptAnswerDtos).build();
+                    attemptQuestionDtos.add(attemptQuestionDto);
+                } catch(Exception e) {
+
+                }
+
             });
             attemptExamResponseDto.setQuestions(attemptQuestionDtos);
             attemptExamResponseDto.setRoomName(roomAttempt.getRoom().getRoomName());
