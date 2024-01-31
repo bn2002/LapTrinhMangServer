@@ -206,7 +206,7 @@ public class ExamManagementService {
             RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
             ArrayList<RoomAttempt> roomAttempts = roomAttemptRepository.getByRoom_RoomId(editRoomDto.getRoomId());
             Response response = new Response("success", "exam.management.statisticExam.success", "", roomAttempts);
-            return JsonUtil.buidResponse(response);
+                 return JsonUtil.buidResponse(response);
         } catch(Exception e) {
             Response response = new Response("error", "exam.management.statisticExam.error", "Có lỗi trong quá trình xem thống kê phòng thi", null);
             return JsonUtil.buidResponse(response);

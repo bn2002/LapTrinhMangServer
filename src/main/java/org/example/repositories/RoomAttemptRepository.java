@@ -19,6 +19,7 @@ import java.util.Optional;
 @Repository
 public interface RoomAttemptRepository extends JpaRepository<RoomAttempt, Integer> {
     public Optional<RoomAttempt> findByRoom_RoomIdAndUserIdAndAttemptStatus(int roomId, int userId, int status);
+    public Optional<RoomAttempt> findFirstByRoom_RoomIdAndUserIdOrderByAttemptIdDesc(int roomId, int userId);
 
     public  RoomAttempt findByAttemptId(int attemptId);
 

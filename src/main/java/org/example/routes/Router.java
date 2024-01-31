@@ -44,6 +44,12 @@ public class Router implements UserControllerDelegate {
                 currentUser = null;
                 Response response = new Response("success", "exam.user.logout_success", "", null);
                 SocketUtil.sendResponse(socket, JsonUtil.buidResponse(response));
+            } else if(method.equals("updateProfile")) {
+                String response = userService.changeProfile(request, this.currentUser);
+                SocketUtil.sendResponse(socket, response);
+            } else if(method.equals("updatePassword")) {
+                String response = userService.changePassword(request, this.currentUser);
+                SocketUtil.sendResponse(socket, response);
             }
         }
 

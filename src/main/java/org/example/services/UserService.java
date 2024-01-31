@@ -1,6 +1,8 @@
 package org.example.services;
 
 import org.example.delegates.UserControllerDelegate;
+import org.example.dtos.ChangePasswordDto;
+import org.example.dtos.ChangeUserProfileDto;
 import org.example.dtos.UserDto;
 import org.example.entities.Request;
 import org.example.entities.Response;
@@ -35,7 +37,7 @@ public class UserService {
             if(this.delegate != null) {
                 this.delegate.loginResponse(userInfo);
             }
-            return JsonUtil.buidResponse(new Response("success", "user.login.success", "Đăng nhập thành công", ""));
+            return JsonUtil.buidResponse(new Response("success", "user.login.success", "Đăng nhập thành công", userInfo));
 
         } catch(Exception e) {
             return JsonUtil.buidResponse(new Response("error", "user.login.error", "Có lỗi không xác định đã xảy ra, hãy thử lại", ""));
@@ -70,5 +72,33 @@ public class UserService {
 
     public boolean logout() {
         return true;
+    }
+
+    public String changeProfile(Request request, User user) {
+        try {
+            UserRepository userRepository = DBUtil.getContext().getBean(UserRepository.class);
+            ChangeUserProfileDto newProfile = MapperUtil.mapFromObject(request.getData(), ChangeUserProfileDto.class);
+            user.setClassCode(newProfile.getClassCode());
+            user.setFullName(newProfile.getFullName());
+            userRepository.save(user);
+            return JsonUtil.buidResponse(new Response("success", "user.update.profile", "Cập nhật thông tin thành công", user));
+        } catch(Exception e) {
+            return JsonUtil.buidResponse(new Response("error", "user.update.error", "Cập nhật thông tin thất bại", ""));
+        }
+    }
+
+    public String changePassword(Request request, User user) {
+        try {
+            UserRepository userRepository = DBUtil.getContext().getBean(UserRepository.class);
+            ChangePasswordDto newPass = MapperUtil.mapFromObject(request.getData(), ChangePasswordDto.class);
+            if(!user.getPassword().equals(newPass.getCurrentPass())) {
+                return JsonUtil.buidResponse(new Response("error", "user.update.error", "Mật khẩu cũ không chính xác", ""));
+            }
+            user.setPassword(newPass.getNewPass());
+            userRepository.save(user);
+            return JsonUtil.buidResponse(new Response("success", "user.update.password", "Cập nhật mật khẩu thành công", ""));
+        } catch(Exception e) {
+            return JsonUtil.buidResponse(new Response("error", "user.update.error", "Cập nhật mật khẩu thất bại", ""));
+        }
     }
 }

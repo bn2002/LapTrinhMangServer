@@ -25,106 +25,130 @@ import java.util.stream.Collectors;
 public class RoomService {
     Logger logger = LoggerFactory.getLogger(RoomService.class);
     public String attempt(Request request, User user) {
-        AttemptExamDto attemptExamDto = MapperUtil.mapFromObject(request.getData(), AttemptExamDto.class);
+        try {
+            AttemptExamDto attemptExamDto = MapperUtil.mapFromObject(request.getData(), AttemptExamDto.class);
 
-        RoomRepository roomRepository = DBUtil.getContext().getBean(RoomRepository.class);
-        AttemptQuestionRepository attemptQuestionRepository = DBUtil.getContext().getBean(AttemptQuestionRepository.class);
+            RoomRepository roomRepository = DBUtil.getContext().getBean(RoomRepository.class);
+            AttemptQuestionRepository attemptQuestionRepository = DBUtil.getContext().getBean(AttemptQuestionRepository.class);
 
-        Optional<Room> roomOptional = roomRepository.findById(attemptExamDto.getRoomId());
+            Optional<Room> roomOptional = roomRepository.findById(attemptExamDto.getRoomId());
 
-        if(!roomOptional.isPresent()) {
-            return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Phòng thi không tồn tại", ""));
-        }
+            if(!roomOptional.isPresent()) {
+                return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Phòng thi không tồn tại", ""));
+            }
 
-        Room room = roomOptional.get();
+            Room room = roomOptional.get();
 
-        // Kiểm tra xem user có được phép vào phòng thi không
-        String classCode = user.getClassCode();
-        if(!room.getListClassId().contains(classCode)) {
-            return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bạn không thuộc đối tượng dự thi", ""));
-        }
-        Timestamp currentTime = Timestamp.from(Instant.now());
-        if(currentTime.after(room.getEndTime())) {
-            return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bài thi này đã kết thúc", ""));
-        }
+            // Kiểm tra xem user có được phép vào phòng thi không
+            String classCode = user.getClassCode();
+            if(!room.getListClassId().contains(classCode)) {
+                return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bạn không thuộc đối tượng dự thi", ""));
+            }
+            Timestamp currentTime = Timestamp.from(Instant.now());
+            if(currentTime.after(room.getEndTime())) {
+                return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bài thi này đã kết thúc", ""));
+            }
 
-        if(currentTime.before(room.getStartTime())) {
-            return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bài thi chưa diễn ra", ""));
-        }
+            if(currentTime.before(room.getStartTime())) {
+                return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bài thi chưa diễn ra", ""));
+            }
 
-        RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
-        // Check xem đã vào thi chưa
-        Optional<RoomAttempt> roomAttemptOptional = roomAttemptRepository.findByRoom_RoomIdAndUserIdAndAttemptStatus(room.getRoomId(), user.getId(), 1);
-        boolean isPractice = room.getIsPractice() == 1;
-        RoomAttempt roomAttempt;
-        // Nếu chưa thi, tạo phiên thi mới
-        if(!roomAttemptOptional.isPresent()) {
-            // Nếu chưa vào thi thì lưu lại lần thi này + đề thi
-            Timestamp endTime = Timestamp.from(Instant.now());
-            endTime.setTime(endTime.getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
+            RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
+            // Check xem đã vào thi chưa
+            Optional<RoomAttempt> roomAttemptOptional = roomAttemptRepository.findFirstByRoom_RoomIdAndUserIdOrderByAttemptIdDesc(room.getRoomId(), user.getId());
+            boolean isPractice = room.getIsPractice() == 1;
+            RoomAttempt roomAttempt;
+            // Nếu chưa thi, tạo phiên thi mới
+            if(!roomAttemptOptional.isPresent()) {
+                // Nếu chưa vào thi thì lưu lại lần thi này + đề thi
+                Timestamp endTime = Timestamp.from(Instant.now());
+                endTime.setTime(endTime.getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
 
-            roomAttempt = RoomAttempt.builder().room(room).user(user).attemptStatus(1).startTime(currentTime).endTime(endTime).build();
-            roomAttemptRepository.save(roomAttempt);
+                roomAttempt = RoomAttempt.builder().room(room).user(user).attemptStatus(1).startTime(currentTime).endTime(endTime).build();
+                roomAttemptRepository.save(roomAttempt);
 
-            ArrayList<AttemptQuestion> attemptQuestions = new ArrayList<>();
+                ArrayList<AttemptQuestion> attemptQuestions = new ArrayList<>();
 
-            RoomAttempt finalRoomAttempt = roomAttempt;
-            ArrayList<QuestionRoom> listQuestionsOfExam = new ArrayList<>(roomAttempt.getRoom().getQuestions());
-            Collections.shuffle(listQuestionsOfExam);
+                RoomAttempt finalRoomAttempt = roomAttempt;
+                ArrayList<QuestionRoom> listQuestionsOfExam = new ArrayList<>(roomAttempt.getRoom().getQuestions());
+                Collections.shuffle(listQuestionsOfExam);
 
-            listQuestionsOfExam.forEach(questionRoom -> {
-                AttemptQuestion attemptQuestion = AttemptQuestion.builder().attemptQuestionId(new AttemptQuestionId(finalRoomAttempt.getAttemptId(), questionRoom.getQuestion().getQuestionId())).build();
-                attemptQuestions.add(attemptQuestion);
-            });
+                listQuestionsOfExam.forEach(questionRoom -> {
+                    AttemptQuestion attemptQuestion = AttemptQuestion.builder().attemptQuestionId(new AttemptQuestionId(finalRoomAttempt.getAttemptId(), questionRoom.getQuestion().getQuestionId())).build();
+                    attemptQuestions.add(attemptQuestion);
+                });
+                attemptQuestionRepository.saveAll(attemptQuestions);
+            } else {
+                roomAttempt = roomAttemptOptional.get();
 
-            attemptQuestionRepository.saveAll(attemptQuestions);
-        } else {
-            roomAttempt = roomAttemptOptional.get();
+                // Status 2 là đã hoàn thành
+                if(roomAttempt.getAttemptStatus() == 2) {
+                    // Nếu là chế độ luyện tập thì cho thi tiếp
+                    if(!isPractice) {
+                        return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bạn đã hoàn thành bài thi này.", ""));
+                    } else {
+                        // Nếu chưa vào thi thì lưu lại lần thi này + đề thi
+                        Timestamp endTime = Timestamp.from(Instant.now());
+                        endTime.setTime(endTime.getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
 
-            // Status 2 là đã hoàn thành
-            if(roomAttempt.getAttemptStatus() == 2) {
-                // Nếu là chế độ luyện tập thì cho thi tiếp
-                if(!isPractice) {
-                    return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Bạn đã hoàn thành bài thi này.", ""));
+                        roomAttempt = RoomAttempt.builder().room(room).user(user).attemptStatus(1).startTime(currentTime).endTime(endTime).build();
+                        roomAttemptRepository.save(roomAttempt);
+                        ArrayList<AttemptQuestion> attemptQuestions = new ArrayList<>();
+
+                        RoomAttempt finalRoomAttempt = roomAttempt;
+                        ArrayList<QuestionRoom> listQuestionsOfExam = new ArrayList<>(roomAttempt.getRoom().getQuestions());
+                        Collections.shuffle(listQuestionsOfExam);
+
+                        listQuestionsOfExam.forEach(questionRoom -> {
+                            AttemptQuestion attemptQuestion = AttemptQuestion.builder().attemptQuestionId(new AttemptQuestionId(finalRoomAttempt.getAttemptId(), questionRoom.getQuestion().getQuestionId())).build();
+                            attemptQuestions.add(attemptQuestion);
+                        });
+
+                        attemptQuestionRepository.saveAll(attemptQuestions);
+                    }
+                }
+
+                Timestamp endAttemptTime = new Timestamp(roomAttempt.getStartTime().getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
+                if(currentTime.after(endAttemptTime) && !isPractice) {
+                    roomAttempt.setAttemptStatus(2);
+                    roomAttemptRepository.save(roomAttempt);
+                    return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Thời gian làm bài đã hết !", ""));
                 }
             }
 
-            Timestamp endAttemptTime = new Timestamp(roomAttempt.getStartTime().getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
-            if(currentTime.after(endAttemptTime) && !isPractice) {
-                roomAttempt.setAttemptStatus(2);
-                roomAttemptRepository.save(roomAttempt);
-                return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Thời gian làm bài đã hết !", ""));
+            // Lấy đáp án mà người dùng trả lời
+            HashMap<Integer, Integer> userSelectedAnswer = new HashMap<>();
+            if(roomAttempt.getAttemptQuestions() != null) {
+                roomAttempt.getAttemptQuestions().forEach(attemptQuestion -> {
+                    userSelectedAnswer.put(attemptQuestion.getAttemptQuestionId().getQuestionId(), attemptQuestion.getSelectedAnswerId());
+                });
             }
+            // Trả về danh sách câu hỏi
+            AttemptExamResponseDto attemptExamResponseDto = new AttemptExamResponseDto();
+
+            ArrayList<AttemptQuestionDto> attemptQuestionDtos = new ArrayList<>();
+            roomAttempt.getRoom().getQuestions().forEach(questionRoom -> {
+                ArrayList<AttemptAnswerDto> attemptAnswerDtos = (ArrayList<AttemptAnswerDto>) questionRoom.getQuestion().getAnswers().stream().map(answer -> new AttemptAnswerDto(answer.getAnswerId(), answer.getAnswerContent())).collect(Collectors.toList());
+                AttemptQuestionDto attemptQuestionDto = AttemptQuestionDto.builder()
+                        .questionContent(questionRoom.getQuestion().getQuestionContent())
+                        .questionId(questionRoom.getQuestionRoomId().getQuestionId())
+                        .answers(attemptAnswerDtos)
+                        .build();
+                if(userSelectedAnswer.get(questionRoom.getQuestionRoomId().getQuestionId()) != null) {
+                    attemptQuestionDto.setSelectedAnswer(userSelectedAnswer.get(questionRoom.getQuestionRoomId().getQuestionId()));
+                }
+                attemptQuestionDtos.add(attemptQuestionDto);
+            });
+            attemptExamResponseDto.setQuestions(attemptQuestionDtos);
+            attemptExamResponseDto.setRoomName(room.getRoomName());
+            attemptExamResponseDto.setAttemptId(roomAttempt.getAttemptId());
+            Timestamp durationInTimestamp = Timestamp.from(Instant.now());
+            durationInTimestamp.setTime(roomAttempt.getStartTime().getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
+            attemptExamResponseDto.setDuration((int) ((durationInTimestamp.getTime() - currentTime.getTime())/ 1000));
+            return JsonUtil.buidResponse(new Response("success", "exam.attempt.success", "Vào thi", attemptExamResponseDto));
+        } catch(Exception e) {
+            return JsonUtil.buidResponse(new Response("error", "exam.attempt.error", "Máy chủ đang bận.Hãy thử lại", null));
         }
-
-        // Lấy đáp án mà người dùng trả lời
-        HashMap<Integer, Integer> userSelectedAnswer = new HashMap<>();
-        roomAttempt.getAttemptQuestions().forEach(attemptQuestion -> {
-            userSelectedAnswer.put(attemptQuestion.getAttemptQuestionId().getQuestionId(), attemptQuestion.getSelectedAnswerId());
-        });
-        // Trả về danh sách câu hỏi
-        AttemptExamResponseDto attemptExamResponseDto = new AttemptExamResponseDto();
-
-        ArrayList<AttemptQuestionDto> attemptQuestionDtos = new ArrayList<>();
-        roomAttempt.getRoom().getQuestions().forEach(questionRoom -> {
-            ArrayList<AttemptAnswerDto> attemptAnswerDtos = (ArrayList<AttemptAnswerDto>) questionRoom.getQuestion().getAnswers().stream().map(answer -> new AttemptAnswerDto(answer.getAnswerId(), answer.getAnswerContent())).collect(Collectors.toList());
-            AttemptQuestionDto attemptQuestionDto = AttemptQuestionDto.builder()
-                    .questionContent(questionRoom.getQuestion().getQuestionContent())
-                    .questionId(questionRoom.getQuestionRoomId().getQuestionId())
-                    .answers(attemptAnswerDtos)
-                    .build();
-            if(userSelectedAnswer.get(questionRoom.getQuestionRoomId().getQuestionId()) != null) {
-                attemptQuestionDto.setSelectedAnswer(userSelectedAnswer.get(questionRoom.getQuestionRoomId().getQuestionId()));
-            }
-            attemptQuestionDtos.add(attemptQuestionDto);
-        });
-        attemptExamResponseDto.setQuestions(attemptQuestionDtos);
-        attemptExamResponseDto.setRoomName(room.getRoomName());
-        attemptExamResponseDto.setAttemptId(roomAttempt.getAttemptId());
-        Timestamp durationInTimestamp = Timestamp.from(Instant.now());
-        durationInTimestamp.setTime(roomAttempt.getStartTime().getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
-        attemptExamResponseDto.setDuration((int) ((durationInTimestamp.getTime() - currentTime.getTime())/ 1000));
-        return JsonUtil.buidResponse(new Response("success", "exam.attempt.success", "Vào thi", attemptExamResponseDto));
     }
 
     public String list(Request request, User user) {
