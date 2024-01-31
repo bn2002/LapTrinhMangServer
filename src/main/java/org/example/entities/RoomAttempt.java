@@ -24,8 +24,9 @@ public class RoomAttempt {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @Column(name = "user_id")
-    private int userId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "start_time")
     private Timestamp startTime;

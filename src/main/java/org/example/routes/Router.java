@@ -87,12 +87,11 @@ public class Router implements UserControllerDelegate {
             }else if(method.equals("deleteExam")) {
                 String response = examManagementService.deleteExam(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
-            }else if(method.equals("viewScoreExam")) {
-                String response = examManagementService.viewExamScore(request, this.currentUser);
+            }else if(method.equals("statisticExam")) {
+                String response = examManagementService.statisticExam(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
             }
         }
-
     }
 
     public void sendError(Socket socket, String message) {

@@ -54,7 +54,7 @@ public class RoomService {
 
         RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
         // Check xem đã vào thi chưa
-        Optional<RoomAttempt> roomAttemptOptional = roomAttemptRepository.findByRoom_RoomIdAndUserId(room.getRoomId(), user.getUserId());
+        Optional<RoomAttempt> roomAttemptOptional = roomAttemptRepository.findByRoom_RoomIdAndUserId(room.getRoomId(), user.getId());
         boolean isPractice = room.getIsPractice() == 1;
         RoomAttempt roomAttempt;
         // Nếu chưa thi, tạo phiên thi mới
@@ -63,7 +63,7 @@ public class RoomService {
             Timestamp endTime = Timestamp.from(Instant.now());
             endTime.setTime(endTime.getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
 
-            roomAttempt = RoomAttempt.builder().room(room).userId(user.getUserId()).attemptStatus(1).startTime(currentTime).endTime(endTime).build();
+            roomAttempt = RoomAttempt.builder().room(room).user(user).attemptStatus(1).startTime(currentTime).endTime(endTime).build();
             roomAttemptRepository.save(roomAttempt);
 
             ArrayList<AttemptQuestion> attemptQuestions = new ArrayList<>();
@@ -201,7 +201,7 @@ public class RoomService {
     public String getHistoryAttempt(Request request, User user) {
         try {
             RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
-            ArrayList<RoomAttempt> roomAttempts = roomAttemptRepository.findAllByUserIdAndAttemptStatusOrderByAttemptIdDesc(user.getUserId(), 2);
+            ArrayList<RoomAttempt> roomAttempts = roomAttemptRepository.findAllByUserIdAndAttemptStatusOrderByAttemptIdDesc(user.getId(), 2);
             ArrayList<RoomAttemptDto> roomAttemptDtos = new ArrayList<>();
             roomAttempts.forEach(roomAttempt -> {
                 RoomAttemptDto roomAttemptDto = RoomAttemptDto.builder()

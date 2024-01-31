@@ -31,6 +31,5 @@ public interface RoomAttemptRepository extends JpaRepository<RoomAttempt, Intege
     @Query(value = "DELETE FROM room_attempts WHERE room_id = :ids", nativeQuery = true)
     public void deleteByRoomId(@Param("ids") int ids);
 
-    @Query(value = "SELECT room_attempts.*, users.fullname, users.username FROM room_attempts INNER JOIN users ON users.user_id = room_attempts.user_id WHERE room_id = :roomId", nativeQuery = true)
     public ArrayList<RoomAttempt> getByRoom_RoomId(int roomId);
 }

@@ -31,9 +31,9 @@ public class ExamManagementService {
             }
 
             Room room = MapperUtil.mapFromObject(roomDto, Room.class);
-            room.setOwnerId(user.getUserId());
+            room.setOwnerId(user.getId());
             room.getQuestions().forEach(questionRoom -> {
-                questionRoom.getQuestion().setOwnerId(user.getUserId());
+                questionRoom.getQuestion().setOwnerId(user.getId());
                 questionRoom.setRoom(room);
                 questionRoom.getQuestion().getAnswers().forEach(tempQuestion -> {
                     tempQuestion.setQuestion(questionRoom.getQuestion());
@@ -56,7 +56,7 @@ public class ExamManagementService {
 
     public String list(Request request, User user) {
         RoomRepository roomRepository = DBUtil.getContext().getBean(RoomRepository.class);
-        ArrayList<Room> listRoom = roomRepository.findAllByOwnerId(user.getUserId());
+        ArrayList<Room> listRoom = roomRepository.findAllByOwnerId(user.getId());
         Response response = new Response("success", "exam.list_room", "", listRoom);
         logger.info("Lấy danh sách phòng thi thành công");
         return JsonUtil.buidResponse(response);
@@ -124,7 +124,7 @@ public class ExamManagementService {
             for(EditQuestionDto questionDto: editQuestionDtos) {
                 if(questionDto.getQuestionId() == 0) {
                     Question newQuestion = MapperUtil.mapFromObject(questionDto, Question.class);
-                    newQuestion.setOwnerId(user.getUserId());
+                    newQuestion.setOwnerId(user.getId());
                     newQuestion.getAnswers().forEach(tempQuestion -> {
                         tempQuestion.setQuestion(newQuestion);
                     });
@@ -200,14 +200,16 @@ public class ExamManagementService {
         }
     }
 
-    public String viewExamScore(Request request, User user) {
+    public String statisticExam(Request request, User user) {
         try {
             EditRoomDto editRoomDto = MapperUtil.mapFromObject(request.getData(), EditRoomDto.class);
             RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
             ArrayList<RoomAttempt> roomAttempts = roomAttemptRepository.getByRoom_RoomId(editRoomDto.getRoomId());
-            return "";
+            Response response = new Response("success", "exam.management.statisticExam.success", "", roomAttempts);
+            return JsonUtil.buidResponse(response);
         } catch(Exception e) {
-            return "";
+            Response response = new Response("error", "exam.management.statisticExam.error", "Có lỗi trong quá trình xem thống kê phòng thi", null);
+            return JsonUtil.buidResponse(response);
         }
     }
 }
