@@ -40,6 +40,10 @@ public class Router implements UserControllerDelegate {
         if(controller.equals("user")) {
             if(method.equals("profile")) {
                 SocketUtil.sendResponse(socket, currentUser.getEmail());
+            } else if(method.equals("logout")) {
+                currentUser = null;
+                Response response = new Response("success", "exam.user.logout_success", "", null);
+                SocketUtil.sendResponse(socket, JsonUtil.buidResponse(response));
             }
         }
 
