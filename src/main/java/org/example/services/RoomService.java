@@ -54,7 +54,7 @@ public class RoomService {
 
         RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
         // Check xem đã vào thi chưa
-        Optional<RoomAttempt> roomAttemptOptional = roomAttemptRepository.findByRoom_RoomIdAndUserId(room.getRoomId(), user.getId());
+        Optional<RoomAttempt> roomAttemptOptional = roomAttemptRepository.findByRoom_RoomIdAndUserIdAndAttemptStatus(room.getRoomId(), user.getId(), 1);
         boolean isPractice = room.getIsPractice() == 1;
         RoomAttempt roomAttempt;
         // Nếu chưa thi, tạo phiên thi mới
@@ -97,13 +97,25 @@ public class RoomService {
             }
         }
 
+        // Lấy đáp án mà người dùng trả lời
+        HashMap<Integer, Integer> userSelectedAnswer = new HashMap<>();
+        roomAttempt.getAttemptQuestions().forEach(attemptQuestion -> {
+            userSelectedAnswer.put(attemptQuestion.getAttemptQuestionId().getQuestionId(), attemptQuestion.getSelectedAnswerId());
+        });
         // Trả về danh sách câu hỏi
         AttemptExamResponseDto attemptExamResponseDto = new AttemptExamResponseDto();
 
         ArrayList<AttemptQuestionDto> attemptQuestionDtos = new ArrayList<>();
         roomAttempt.getRoom().getQuestions().forEach(questionRoom -> {
             ArrayList<AttemptAnswerDto> attemptAnswerDtos = (ArrayList<AttemptAnswerDto>) questionRoom.getQuestion().getAnswers().stream().map(answer -> new AttemptAnswerDto(answer.getAnswerId(), answer.getAnswerContent())).collect(Collectors.toList());
-            AttemptQuestionDto attemptQuestionDto = AttemptQuestionDto.builder().questionContent(questionRoom.getQuestion().getQuestionContent()).questionId(questionRoom.getQuestionRoomId().getQuestionId()).answers(attemptAnswerDtos).build();
+            AttemptQuestionDto attemptQuestionDto = AttemptQuestionDto.builder()
+                    .questionContent(questionRoom.getQuestion().getQuestionContent())
+                    .questionId(questionRoom.getQuestionRoomId().getQuestionId())
+                    .answers(attemptAnswerDtos)
+                    .build();
+            if(userSelectedAnswer.get(questionRoom.getQuestionRoomId().getQuestionId()) != null) {
+                attemptQuestionDto.setSelectedAnswer(userSelectedAnswer.get(questionRoom.getQuestionRoomId().getQuestionId()));
+            }
             attemptQuestionDtos.add(attemptQuestionDto);
         });
         attemptExamResponseDto.setQuestions(attemptQuestionDtos);
@@ -111,7 +123,7 @@ public class RoomService {
         attemptExamResponseDto.setAttemptId(roomAttempt.getAttemptId());
         Timestamp durationInTimestamp = Timestamp.from(Instant.now());
         durationInTimestamp.setTime(roomAttempt.getStartTime().getTime() + TimeUnit.MINUTES.toMillis(room.getDuration()));
-        attemptExamResponseDto.setDuration((int) ((durationInTimestamp.getTime() - currentTime.getTime())/ 1000 / 60));
+        attemptExamResponseDto.setDuration((int) ((durationInTimestamp.getTime() - currentTime.getTime())/ 1000));
         return JsonUtil.buidResponse(new Response("success", "exam.attempt.success", "Vào thi", attemptExamResponseDto));
     }
 

@@ -1,5 +1,6 @@
 package org.example.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -42,6 +43,7 @@ public class RoomAttempt {
 
     @OneToMany(mappedBy = "roomAttempt", fetch = FetchType.EAGER)
     @ToString.Exclude
+    @JsonIgnore
     private List<AttemptQuestion> attemptQuestions;
 
     @Column(name = "created_at")

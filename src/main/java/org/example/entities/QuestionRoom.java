@@ -31,6 +31,7 @@ public class QuestionRoom {
     @AttributeOverride(name = "roomId", column = @Column(name = "room_id"))
     @JsonBackReference
     @ToString.Exclude
+    @JsonIgnore
     private Room room;
 
     @Column(name = "question_point")

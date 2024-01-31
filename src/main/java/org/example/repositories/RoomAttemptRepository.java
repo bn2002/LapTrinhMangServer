@@ -13,11 +13,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Repository
 public interface RoomAttemptRepository extends JpaRepository<RoomAttempt, Integer> {
-    public Optional<RoomAttempt> findByRoom_RoomIdAndUserId(int roomId, int userId);
+    public Optional<RoomAttempt> findByRoom_RoomIdAndUserIdAndAttemptStatus(int roomId, int userId, int status);
 
     public  RoomAttempt findByAttemptId(int attemptId);
 
@@ -32,4 +33,7 @@ public interface RoomAttemptRepository extends JpaRepository<RoomAttempt, Intege
     public void deleteByRoomId(@Param("ids") int ids);
 
     public ArrayList<RoomAttempt> getByRoom_RoomId(int roomId);
+
+    @Query(value = "SELECT `score`, COUNT(attempt_id) as count_attempt from room_attempts WHERE room_id = :roomId group by `score`;", nativeQuery = true)
+    public ArrayList<Object> getHistogramChart(@Param("roomId") int roomId);
 }

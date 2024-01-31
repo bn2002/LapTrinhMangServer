@@ -212,4 +212,17 @@ public class ExamManagementService {
             return JsonUtil.buidResponse(response);
         }
     }
+
+    public String histogramExam(Request request, User user) {
+        try {
+            EditRoomDto editRoomDto = MapperUtil.mapFromObject(request.getData(), EditRoomDto.class);
+            RoomAttemptRepository roomAttemptRepository = DBUtil.getContext().getBean(RoomAttemptRepository.class);
+            ArrayList<Object> roomAttempts = roomAttemptRepository.getHistogramChart(editRoomDto.getRoomId());
+            Response response = new Response("success", "exam.management.histogramExam.success", "", roomAttempts);
+            return JsonUtil.buidResponse(response);
+        } catch(Exception e) {
+            Response response = new Response("error", "exam.management.histogramExam.error", "Có lỗi trong quá trình lấy thông tin biểu đồ", null);
+            return JsonUtil.buidResponse(response);
+        }
+    }
 }

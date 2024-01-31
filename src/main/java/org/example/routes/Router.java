@@ -90,6 +90,9 @@ public class Router implements UserControllerDelegate {
             }else if(method.equals("statisticExam")) {
                 String response = examManagementService.statisticExam(request, this.currentUser);
                 SocketUtil.sendResponse(socket, response);
+            }else if(method.equals("histogramExam")) {
+                String response = examManagementService.histogramExam(request, this.currentUser);
+                SocketUtil.sendResponse(socket, response);
             }
         }
     }
